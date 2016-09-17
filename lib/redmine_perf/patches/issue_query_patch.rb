@@ -8,7 +8,7 @@ module  RedminePerf
 
         base.send(:include, InstanceMethods)
         base.class_eval do
-          alias_method_chain :issues, :perf
+          # alias_method_chain :issues, :perf
           class<< self
           end
 
