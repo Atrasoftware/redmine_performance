@@ -7,9 +7,10 @@ module  RedminePerf
         base.extend(ClassMethods)
 
         base.send(:include, InstanceMethods)
-        base.class_eval d
-        class<< self
-          alias_method_chain :latest, :perf
+        base.class_eval do
+          class<< self
+            alias_method_chain :latest, :perf
+          end
         end
       end
     end
