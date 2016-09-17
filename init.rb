@@ -12,5 +12,6 @@ Rails.application.config.to_prepare do
   MyHelper.send(:include, RedminePerf::Patches::MyHelperPatch)
   IssueQuery.send(:include, RedminePerf::Patches::IssueQueryPatch)
   CustomField.send(:include, RedminePerf::Patches::CustomFieldPatch)
+  News.send(:include, RedminePerf::Patches::NewsPatch)
   # Redmine::Search::Fetcher.send(:include, RedminePerf::Patches::FetchPatch)
 end
