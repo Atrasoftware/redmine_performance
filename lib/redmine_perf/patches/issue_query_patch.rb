@@ -8,6 +8,7 @@ module  RedminePerf
 
         base.send(:include, InstanceMethods)
         base.class_eval do
+          alias_method_chain :issues, :perf
           class<< self
           end
 
@@ -39,6 +40,41 @@ module  RedminePerf
       end
     end
     module InstanceMethods
+      def issues_with_perf(options={})
+        order_option = [group_by_sort_order, options[:order]].flatten.reject(&:blank?)
+
+        v = joins_for_order_statement(order_option.join(','))
+        scope = Issue.visible.
+            where(statement).
+            includes(([:status, :project] + (options[:include] || [])).uniq).
+            references(([:status, :project] + (options[:include] || [])).uniq).
+            where(options[:conditions]).
+            order(order_option).
+            includes(v).
+            references(v).
+            limit(options[:limit]).
+            offset(options[:offset])
+
+        scope = scope.preload(:custom_values)
+        if has_column?(:author)
+          scope = scope.preload(:author)
+        end
+
+        issues = scope.to_a
+
+        if has_column?(:spent_hours)
+          Issue.load_visible_spent_hours(issues)
+        end
+        if has_column?(:total_spent_hours)
+          Issue.load_visible_total_spent_hours(issues)
+        end
+        if has_column?(:relations)
+          Issue.load_visible_relations(issues)
+        end
+        issues
+      rescue ::ActiveRecord::StatementInvalid => e
+        raise StatementInvalid.new(e.message)
+      end
     end
 
     module ClassMethods
