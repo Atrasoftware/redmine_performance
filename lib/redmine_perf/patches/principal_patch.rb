@@ -16,8 +16,8 @@ module  RedminePerf
               all
             else
               view_all_active = false
-              if !user.memberships.empty?
-                view_all_active = !user.memberships.includes(:roles).references(:roles).where("#{Role.table_name}.users_visibility = 'all' ").empty?
+              if user.memberships.any?
+                view_all_active = user.memberships.any? {|m| m.roles.any? {|r| r.users_visibility == 'all'}}
               else
                 view_all_active = user.builtin_role.users_visibility == 'all'
               end

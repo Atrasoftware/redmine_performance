@@ -20,7 +20,7 @@ module  RedminePerf
 
             if user.admin?
               scope.where("#{table_name}.visibility <> ? OR #{table_name}.user_id = ?", Query::VISIBILITY_PRIVATE, user.id)
-            elsif user.memberships.count > 0
+            elsif !user.memberships.empty?
               scope.where("#{table_name}.visibility = ?" +
                               " OR (#{table_name}.visibility = ? AND #{table_name}.id IN (" +
                               "SELECT DISTINCT q.id FROM #{table_name} q" +

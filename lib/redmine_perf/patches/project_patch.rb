@@ -12,9 +12,6 @@ module  RedminePerf
           class<< self
             alias_method_chain :allowed_to_condition, :perf
           end
-
-
-
         end
       end
 
@@ -26,6 +23,12 @@ module  RedminePerf
         if perm && perm.project_module
           # If the permission belongs to a project module, make sure the module is enabled
           base_statement << " AND EXISTS (SELECT 1 AS one FROM #{EnabledModule.table_name} em WHERE em.project_id = #{Project.table_name}.id AND em.name='#{perm.project_module}')"
+          # project_ids_with_module_enabled = EnabledModule.where(name: perm.project_module).pluck(:project_id)
+          # if project_ids_with_module_enabled.present?
+          #   base_statement << " AND #{Project.table_name}.id IN (#{project_ids_with_module_enabled.join ','})"
+          # else
+          #   base_statement << " AND 1=0"
+          # end
         end
         if project = options[:project]
           project_statement = project.project_condition(options[:with_subprojects])
