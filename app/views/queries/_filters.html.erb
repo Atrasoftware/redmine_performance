@@ -3,7 +3,7 @@
         var operatorByType = <%= raw_json Query.operators_by_filter_type %>;
         var availableFilters = <%= raw_json query.available_filters_as_json %>;
         var labelDayPlural = <%= raw_json l(:label_day_plural) %>;
-    <% cache ["projects/index", "user-#{User.current.id}/#{User.current.updated_on.iso8601}", "#{Project.order("updated_on desc").first.updated_on}"] do %>
+    <% cache ["queries/filter", "user-#{User.current.id}/#{User.current.updated_on.iso8601}", "#{Project.order("updated_on desc").first.updated_on}"] do %>
 
         var allProjects = <%= raw_json query.all_projects_values %>;
     <% end %>
