@@ -49,11 +49,12 @@ module  RedminePerf
               statement_by_role[role] = s
             end
           end
-          user.projects_by_role.each do |role, project_ids|
-            if role.allowed_to?(permission) && project_ids.any?
-              statement_by_role[role] = "#{Project.table_name}.id IN (#{project_ids.join(',')})"
-            end
-          end
+          statement_by_role.merge!(user.user_statement_role(permission))
+          # user.projects_by_role.each do |role, project_ids|
+          #   if role.allowed_to?(permission) && project_ids.any?
+          #     statement_by_role[role] = "#{Project.table_name}.id IN (#{project_ids.join(',')})"
+          #   end
+          # end
           if statement_by_role.empty?
             "1=0"
           else

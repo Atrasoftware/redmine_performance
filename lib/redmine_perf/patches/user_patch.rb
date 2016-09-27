@@ -20,12 +20,26 @@ module  RedminePerf
     module InstanceMethods
       def reload_with_memberships(*args)
         @memberships = nil
+        @user_statement_role = {}
         reload_without_memberships(*args)
       end
 
       def memberships
         @memberships ||= begin
           super
+        end
+      end
+
+      def user_statement_role(permission)
+        @user_statement_role ||= {}
+        @user_statement_role[permission] ||= begin
+          @user_statement_role[permission] = {}
+          self.projects_by_role.each do |role, project_ids|
+            if role.allowed_to?(permission) && project_ids.any?
+              @user_statement_role[permission][role] = "#{Project.table_name}.id IN (#{project_ids.join(',')})"
+            end
+          end
+          @user_statement_role[permission]
         end
       end
 
@@ -52,9 +66,9 @@ module  RedminePerf
           end
         end
 
-        hash.each do |role, projects|
-          projects.uniq!
-        end
+        # hash.each do |role, projects|
+        #   projects.uniq!
+        # end
 
         @projects_by_role = hash
       end
